@@ -76,7 +76,7 @@ export default class ParseLoader {
 
   /**
    * Reloads the search for the current limit and skip
-   * @return {Parse.Object[]}
+   * @return {Promise<Parse.Object[]>}
    */
   reload() {
     return this.find();
@@ -84,7 +84,7 @@ export default class ParseLoader {
 
   /**
    * Finds more elements for the query
-   * @return {Parse.Object[]}
+   * @return {Promise<Parse.Object[]>}
    */
   findMore() {
     this.skip += this.limit;
@@ -92,13 +92,49 @@ export default class ParseLoader {
   }
 
   /**
-   * Queries the Parse database, using pagination
-   * @return {Parse.Object[]}
+   * Queries the Parse database, where each execution 
+   * returns the next page of results
+   * @return {Promise<Parse.Object[]>}
    */
-  findPaginated() {
+  findInfinite() {
+    if(this.executed) {
+        this.skip += this.limit;
+    }
+
+    return this.find();
+  }
+
+  /**
+   * Queries the Parse database, where each execution 
+   * returns the next page of results
+   * @return {Promise<Parse.Object[]>}
+   */
+  findNext() {
     if(this.executed) {    
         this.skip += this.limit;
     }
+    return this.find();
+  }
+
+  /**
+   * Queries the Parse database, where each execution 
+   * returns the previous page of results
+   * @return {Promise<Parse.Object[]>}
+   */
+  findPrevious() {
+    if(this.executed) {
+      // set to 0 if skip is less than 0
+      if(this.skip - this.limit < 0) {
+        this.skip = 0;
+      } else if(this.skip - this.limit >= 0) {
+        this.skip -= this.limit;
+      }
+    }
+
+    if(this.skip < 0) {
+      this.skip = 0;
+    }
+
     return this.find();
   }
 }

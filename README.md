@@ -32,7 +32,13 @@ loader.canLoadMore(); // boolean
 loader.findMore(); // Promise<Parse.Object[]>
 
 // loads items infinitely from a Parse Database
-loader.findPaginated(); // Promise<Parse.Object[]>
+loader.findInfinite(); // Promise<Parse.Object[]>
+
+// loads items infinitely from a Parse Database
+loader.findNext(); // Promise<Parse.Object[]>
+
+// loads items infinitely (backwards) from a Parse Database
+loader.findPrevious(); // Promise<Parse.Object[]>
 
 // reloads the current search
 loader.reload(); // Promise<Parse.Object[]>
@@ -61,7 +67,7 @@ const loader = new ParseLoader(q, 10, 0);
 
 // function that triggers when the user first enters the page
 function onEnter() {
-    loader.findPaginated()
+    loader.findInfinite()
     .then(results => {
     // do something with the results...
     });
@@ -77,7 +83,7 @@ function onReload(){
 
 // function that executes when the user reached the bottom of the page
 function onUserScrolledToTheBottom() {
-    loader.findPaginated()
+    loader.findInfinite()
     .then(results => {
     // do something with the results...
     });
