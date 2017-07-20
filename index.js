@@ -1,21 +1,24 @@
 /* eslint-disable no-underscore-dangle */
-
-export default class ParseLoader {
+module.exports = class ParseLoader {
 
   /**
    * @param {Parse.Query} query 
    * @param {number} limit 
    * @param {number} skip 
    */
-  constructor(query, limit, skip) {
+  constructor(query, limit = 10, skip = 0) {
     this.query = query;
     this.limit = limit;
     this.skip = skip;
-
-    this.executed = false;
-    this._canLoadMore = true;
+    this._start();
   }
 
+  _start() {
+    this._canLoadMore = true;
+    this._hadError = false;
+    this.executedFind = false;
+    this.executedFirst = false;
+  }
 
   setQuery(q) {
     this.query = q;
@@ -33,13 +36,24 @@ export default class ParseLoader {
    * @return {boolean}
    */
   canLoadMore() {
-    if (!this.executed) {
+    if (!this.executedFind) {
       return true;
     }
 
     return this._canLoadMore;
   }
 
+  /**
+   * Returns true if the loading had an error
+   * @return {boolean}
+   */
+  hadError() {
+    if (!this.executedFind && !this.executedFirst) {
+      return false;
+    }
+
+    return this._hadError;
+  }
 
   /**
    * Returns the first result on the query given
@@ -49,10 +63,13 @@ export default class ParseLoader {
   first(options = {}) {
     return new Promise((resolve, reject) => {
       this.query.find(options).then((result) => {
-        this.executed = true;
+        this.executedFirst = true;
         this._canLoadMore = !!result;
         resolve(result);
-      }, reject);
+      }, e => {
+        this._hadError = true;
+        reject(e);
+      });
     });
   }
 
@@ -67,11 +84,24 @@ export default class ParseLoader {
         .limit(this.limit)
         .skip(this.skip)
         .find(options).then((results) => {
-          this.executed = true;
-          this._canLoadMore = this.results.length === this.limit;
+          this.executedFind = true;
+          this._canLoadMore = results.length === this.limit;
           resolve(results);
-        }, reject);
+        },  e => {
+          this._hadError = true;
+          reject(e);
+        });
     });
+  }
+
+  /**
+   * Restarts skip in 0
+   * @return {ParseLoader}
+   */
+  restart() {
+    this.skip = 0;
+    this._start();
+    return this;
   }
 
   /**
@@ -83,36 +113,15 @@ export default class ParseLoader {
   }
 
   /**
-   * Finds more elements for the query
-   * @return {Promise<Parse.Object[]>}
-   */
-  findMore() {
-    this.skip += this.limit;
-    return this.find();
-  }
-
-  /**
-   * Queries the Parse database, where each execution 
-   * returns the next page of results
-   * @return {Promise<Parse.Object[]>}
-   */
-  findInfinite() {
-    if(this.executed) {
-        this.skip += this.limit;
-    }
-
-    return this.find();
-  }
-
-  /**
    * Queries the Parse database, where each execution 
    * returns the next page of results
    * @return {Promise<Parse.Object[]>}
    */
   findNext() {
-    if(this.executed) {    
+    if(this.executedFind && !this.hadError()) {
         this.skip += this.limit;
     }
+
     return this.find();
   }
 
@@ -122,7 +131,7 @@ export default class ParseLoader {
    * @return {Promise<Parse.Object[]>}
    */
   findPrevious() {
-    if(this.executed) {
+    if(this.executedFind) {
       // set to 0 if skip is less than 0
       if(this.skip - this.limit < 0) {
         this.skip = 0;

@@ -25,14 +25,11 @@ loader.first(); // Promise<Parse.Object>
 // returns the first item on the query, using ES2015 promises
 loader.find(); // Promise<Parse.Object[]>
 
+// restarts finding at skip 0
+loader.restart(); // Promise<Parse.Object[]>
+
 // says if you can load more (only available after first find)
 loader.canLoadMore(); // boolean
-
-// finds more results for the given query
-loader.findMore(); // Promise<Parse.Object[]>
-
-// loads items infinitely from a Parse Database
-loader.findInfinite(); // Promise<Parse.Object[]>
 
 // loads items infinitely from a Parse Database
 loader.findNext(); // Promise<Parse.Object[]>
@@ -67,7 +64,7 @@ const loader = new ParseLoader(q, 10, 0);
 
 // function that triggers when the user first enters the page
 function onEnter() {
-    loader.findInfinite()
+    loader.findNext()
     .then(results => {
     // do something with the results...
     });
@@ -83,7 +80,7 @@ function onReload(){
 
 // function that executes when the user reached the bottom of the page
 function onUserScrolledToTheBottom() {
-    loader.findInfinite()
+    loader.findNext()
     .then(results => {
     // do something with the results...
     });
@@ -93,7 +90,8 @@ function onUserScrolledToTheBottom() {
 
 
 ## Bonus
-This package has no external dependencies :D
+* This package has no external dependencies :D
+* #findNext takes into account if the search had any errors and repeats the same search
 
 ## LICENSE 
 MIT  
