@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## v1.2.1
+Removed unused dependencies. Moved Babel to devDependencies and Parse to peerDependencies
+
 ## v1.2.0
 new: New APIs restart
 change: Removed findInfinite and findMore in favour of findNext
