@@ -2,6 +2,18 @@
 
 This is a class that helps you develop when you need to get results from a Parse backend.
 
+<!-- TOC -->
+
+- [parse-loader](#parse-loader)
+  - [Installation](#installation)
+  - [API](#api)
+    - [Examples](#examples)
+      - [Finding elements from a query in a paginated, infinite way](#finding-elements-from-a-query-in-a-paginated-infinite-way)
+  - [Bonus](#bonus)
+  - [LICENSE](#license)
+
+<!-- /TOC -->
+
 ## Installation
 ```
 $> npm i --save parse-loader
