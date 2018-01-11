@@ -1,5 +1,13 @@
 /* eslint-disable no-underscore-dangle */
-module.exports = class ParseLoader {
+class ParseLoader {
+
+  query: any;
+  limit: number;
+  skip: number;
+  _hadError: boolean;
+  _canLoadMore: boolean;
+  executedFind: boolean;
+  executedFirst: boolean;
 
   /**
    * @param {Parse.Query} query 
@@ -147,3 +155,5 @@ module.exports = class ParseLoader {
     return this.find();
   }
 }
+
+module.exports = ParseLoader;
