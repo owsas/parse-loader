@@ -109,3 +109,6 @@ function onUserScrolledToTheBottom() {
 MIT  
 Developed by Juan Camilo Guarín Peñaranda  
 Otherwise SAS, Colombia, 2017  
+
+## Support us on Patreon
+[![patreon](./repo/patreon.png)](https://patreon.com/owsas)
